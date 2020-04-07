@@ -9,7 +9,7 @@ You can find the complete fan (including the controller) at https://www.homedepo
 
 This device handler has a main device for Fan Control and a child device for light control
 
-![Device on Smartthings app](images/screenshots/screenshot1.jpg) ![Device on Smartthings app](images/screenshots/screenshot2.jpg) ![Fan child deice on Smartthings app](images/screenshots/screenshot2.jpg)
+![Device handler on Smartthings app](images/screenshots/screenshots.jpg)
 
 ### Validation scenario 
 This device handler was tested using Samsung Connect Home Pro (Smartthings V2 Hub) with Firmware version	000.027.00010 in a set up with +10 Zigbee devices. I used two King Of Fans, Inc. model HDC52EastwindFan at the same network.
