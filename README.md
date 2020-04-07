@@ -3,15 +3,11 @@ Smartthings device handler for Home Depot Home Decorators Zigbee Fan (and fan co
 
 You can find the complete fan (including the controller) on the following links:
 
-<p align="center">
 [![Home Depot Home Decorators Zigbee Fan](images/home-decorators-collection-ceiling-fan.jpg)](https://www.homedepot.com/p/Home-Decorators-Collection-Gardinier-52-in-LED-Indoor-Brushed-Nickel-WINK-Enabled-Smart-Ceiling-Fan-with-Integrated-Light-Kit-with-Remote-Control-43260/206648825)
 [![Hampton Bay Universal Wink Enabled White Ceiling Fan Premier Remote Control](images/hampton-bay-ceiling-fan-remotes.jpg)](https://www.homedepot.com/p/Hampton-Bay-Universal-Wink-Enabled-White-Ceiling-Fan-Premier-Remote-Control-99432/206591100)
-</p>
 
 This device handler has a main device for Fan Control and a child device for light control
-<p align="center">
 ![Device handler on Smartthings app](images/screenshots/screenshots.jpg)
-</p>
 
 ### Validation scenario 
 This device handler was tested using Samsung Connect Home Pro (Smartthings V2 Hub) with Firmware version	000.027.00010 in a set up with +10 Zigbee devices. I used two King Of Fans, Inc. model HDC52EastwindFan at the same network.
