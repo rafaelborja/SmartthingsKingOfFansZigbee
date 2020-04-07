@@ -5,24 +5,19 @@ You can find the complete fan (including the controller) at https://www.homedepo
 
 
 ![Home Depot Home Decorators Zigbee Fan](images/home-decorators-collection-ceiling-fan.jpg)
-![Hampton Bay Universal Wink Enabled White Ceiling Fan Premier Remote Control](images/hampton-bay-ceiling-fan-remotes.jpg.jpg)
+![Hampton Bay Universal Wink Enabled White Ceiling Fan Premier Remote Control](images/hampton-bay-ceiling-fan-remotes.jpg)
 
+This device handler has a main device for Fan Control and a child device for light control
 
-### A note on https://github.com/dcoffing/KOF-CeilingFan
-
-dcoffing made an amazing work with the legacy device handler https://github.com/dcoffing/KOF-CeilingFan. This device handler is not working with the new Smartthings app. For this reason I decided to make the needed changes and send PRs to contribute with the existing project, but unfortunately the project seems to be abandoned. 
-
-This device handler has also a simplified interface and less child devices (no child devices for the fan, only one for the light).
-
-This device handler would not be possible with all work and effort from dcoffing and all that contributed to the legacy device handler.
+![Device on Smartthings app](images/screenshots/screenshot1.jpg) ![Device on Smartthings app](images/screenshots/screenshot2.jpg) ![Fan child deice on Smartthings app](images/screenshots/screenshot2.jpg)
 
 ### Validation scenario 
 This device handler was tested using Samsung Connect Home Pro (Smartthings V2 Hub) with Firmware version	000.027.00010 in a set up with +10 Zigbee devices. I used two King Of Fans, Inc. model HDC52EastwindFan at the same network.
 
-
 ### Known issues
 - Random delays to update child device.
 - Excess message logging and events generated
+- Child light device shows as off-line
 
 ### Install Instructions
 
@@ -32,6 +27,16 @@ Follow [Smartthings Git Hub Integration Guide](https://docs.smartthings.com/en/l
 **Developer note: Please feel free to try Smartthings Git Hub Integration and validate if this issue is specific to my installation. **
 
 You can also create a new device handler from code copying and pasting [child-contact-sensor device handler](devicetypes/rafaelborja/child-contact-sensor.src/child-contact-sensor.groovy) and [child-contact-sensor device handler]( devicetypes/rafaelborja/august-lock-pro-zwave-lock-with-doorsense.src/august-lock-pro-zwave-lock-with-doorsense.groovy) source code
+
+### A note on https://github.com/dcoffing/KOF-CeilingFan
+
+dcoffing made an amazing work with the legacy device handler https://github.com/dcoffing/KOF-CeilingFan. This device handler is not working with the new Smartthings app. For this reason I decided to make the needed changes and send PRs to contribute with the existing project, but unfortunately the project seems to be abandoned. 
+
+This device handler has also a simplified interface and less child devices (no child devices for the fan, only one for the light).
+
+This device handler would not be possible with all work and effort from dcoffing and all that contributed to the legacy device handler.
+
+
 
 ### FAQ
 #### Why the fan buttons devices are gone?
