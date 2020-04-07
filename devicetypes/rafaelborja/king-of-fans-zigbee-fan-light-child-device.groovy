@@ -34,7 +34,7 @@
  2017 Year
 */
 metadata {
-	definition (name: "King of Fans Zigbee Fan - Light Child Device", namespace: "smartthings", ocfDeviceType:"oic.d.light", author: "Stephan Hackett", vid: "generic-dimmer") {
+	definition (name: "King of Fans Zigbee Fan - Light Child Device", namespace: "rafaelborja", ocfDeviceType:"oic.d.light", author: "Rafael Borja", vid: "generic-dimmer") {
 		capability "Switch"
 		capability "Actuator"
 		capability "Sensor"
