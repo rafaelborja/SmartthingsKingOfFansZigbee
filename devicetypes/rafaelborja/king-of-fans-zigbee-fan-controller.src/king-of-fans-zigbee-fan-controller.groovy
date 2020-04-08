@@ -31,32 +31,6 @@ def currVersions(child) {						//Let's user know if running the child versions t
  if(child=="light") {return "ver 0.2.18a"}	//manually enter the version of the LIGHT child that matches the parent version above
 }
 
-/*
-
- 05/15 added GRN=OK RED=Update to version tile, changed parent tile version to fill empty space, shorten ver to increase font in tile
-    a- fixed line 225 -Light
- 05/05 modified Refresh text to Delete&Recreate
-	b- test new label Speed 1 (LOW) technique
-    a- evaluating new Speed 1,2,3,4 for ease of voice and look, it matches the fan speed bar icons instead of Lo, Med, Hi
- 05/04 Modified labels lowercase,Comfort Breeze™ , getFanName() to be longer names vs abbr
- 05/03 renamed LAMP to LIGHT in all instances to conform to ST standards
- 05/01 fixed bug when recreated child names didn't use the new name but the original name; def createFanChild() 
-    c- added TurningBreezeOff attributeState to match the Breeze icon 
-    b- added CeilingFanParent in version, added new grey OFF icons
-    a- move Stephack latest changes;(one step child delete/create, etc) over in a copy/paste; change namespace
- 04/30 Moved refresh()Configure() from child creation method to initialize, added individual icons for fan child
- 04/29 new icons with fanspeed bar indication
-	e- added changes from Stephan to fix createChild error
-	d- go back to orginal code on line 182
-	c- createFanChild code added line 182 ChildDevice this part is the BUG that wont' create all fanChild devices
-	b- details for childVer, added getChildVer() & def getChildVer()
- 	a- attribute LchildVer, FchildVer
- 04/28 reverted back to 0426 and added new revision labeling to parent
- 04/26 label changes to read naturally, CAP light to match child speeds
- 04/25 label changes; Breeze color #008B64
- 0.2.1b parent on-off states sync with any child state for ActionTiles
- 04/19 added version tile to help in troubleshooting with users
-*/
 metadata {
 	definition(name: "King of Fans Zigbee Fan Controller", namespace: "rafaelborja", author: "Rafael Borja", ocfDeviceType: "oic.d.fan", genericHandler: "Zigbee") {
     // definition (cstHandler: true, name: "AKOF Zigbee Fan Controller 1", namespace: "smartthings", author: "Stephan Hackett, Ranga Pedamallu, Dale Coffing, Rafael Borja",
@@ -68,6 +42,7 @@ metadata {
 		capability "Actuator"
 		capability "Refresh"
 		capability "Sensor"
+        capability "Configuration"
 
 		command "low"
 		command "medium"
@@ -99,177 +74,26 @@ metadata {
 		}
 		main "fanSpeed"
 		details(["fanSpeed", "refresh"])
-     
-   
-
-        
-        
-        
-    /*     runLocally: true, executeCommandsLocally: true,  ocfDeviceType: "oic.d.fan",  vid: "generic-switch" /*, vid: "generic-rgbw-color-bulb", genericHandler: "Zigbee" ) {
-    // ocfDeviceType: "oic.d.fan" vid: "generic-rgbw-color-bulb"
-    ///  runLocally: true, executeCommandsLocally: true, 
-	/*	capability "Actuator"
-        capability "Configuration"
-        capability "Refresh"
-        capability "Switch"       
-        capability "Light"
-        capability "Sensor" 
-        capability "Polling"
-        capability "Switch Level"
-        //capability "Health Check"
-        capability "Button"
-        capability "Fan Speed"
-        
-        capability "Switch Level"
-		capability "Switch"
-		capability "Fan Speed"
-		capability "Health Check"
-		capability "Actuator"
-		capability "Refresh"
-		capability "Sensor"*/
-        
-        // capability "Switch Level"
-		// capability "Switch"
-		
-		// capability "Health Check"
-		// capability "Actuator"
-		// capability "Refresh"
-		// capability "Sensor"
-        // capability "Light"
-		//capability "Fan Speed"
-        
-        /*
-
-		command "low"
-		command "medium"
-		command "high"
-		command "raiseFanSpeed"
-		command "lowerFanSpeed"
-        
-        capability "Stateless Fanspeed Button"
-		capability "Stateless Fanspeed Mode Button"
-		capability "Stateless Power Button"
-   
-        command "lightOn"
-        command "lightOff"
-        command "lightLevel"
-        command "setFanSpeed"   
-        
-        command "low"
-		command "medium"
-		command "high"
-		command "raiseFanSpeed"
-		command "lowerFanSpeed"
+	}
+    
+    preferences {
+        // section("Google assistant fan control using dimmer") {
+        input ( type: "paragraph", element: "paragraph", title: "Google assistant fan control using dimmer", description: "\
+        		If you are using Google assistant you can set this option to true to control fan speed using light dimmer.\
+                Google asistant does not properly support fan speed dial, showing it as a light dimmer instead.\
+                When this option is activiated you can set fan speed with the command \"Set <FAN NAME> speed to <0 to 100>\", where:\n\
+                 - 0 to 24 is speed 25 (turn off),\n\
+                 - 24 to 49 is speed 1 (low),\n\
+                 - 50 to 74 is speed 2 (medium),\n\
+                 - 75 to 100 is speed 3 (high),\n\
+                 \n\
+                 \n\
+                 You can still use the on/off button as usual (fan on/off). To control light level you must use child light device (shown as a regular light)")
+                 
+        	input "dimmerAsFanControl", "number", title: "Use dimmer to control fan? (type 1 to yes, empty to no)", displayDuringSetup: true
+       // }
        
-        
-        attribute "fanMode", "string" 			//stores fanspeed
-        attribute "lightBrightness", "number"	//stores brightness level
-        attribute "lastFanMode", "string"		//used to restore previous fanmode
-        attribute "LchildVer", "string"			//stores light child version
-        attribute "FchildVer", "string"			//stores fan child version
-        attribute "LchildCurr", "string"			//stores color of version check
-        attribute "FchildCurr", "string"			//stores color of version check
-        */
-      /*
-	fingerprint profileId: "0104", inClusters: "0000,0003,0004,0005,0006,0008,0003,0019" /*,0202" /, outClusters: "0003,0019" , model: "HDC52EastwindFan" */
-    // fingerprint profileId: "0104", inClusters: "*", outClusters: "0003,0019", model: "HDC52EastwindFan"
-    // }
-   
-
-    
-    /*
-    
-    tiles(scale: 2) {
-        
-		multiAttributeTile(name: "fanSpeed", type: "generic", width: 6, height: 4, canChangeIcon: true) {
-			tileAttribute("device.fanSpeed", key: "PRIMARY_CONTROL") {
-				attributeState "0", label: "off", action: "switch.on", icon: "st.thermostat.fan-off", backgroundColor: "#ffffff"
-				attributeState "1", label: "low", action: "switch.off", icon: "st.thermostat.fan-on", backgroundColor: "#00a0dc"
-				attributeState "2", label: "medium", action: "switch.off", icon: "st.thermostat.fan-on", backgroundColor: "#00a0dc"
-				attributeState "3", label: "high", action: "switch.off", icon: "st.thermostat.fan-on", backgroundColor: "#00a0dc"
-			}
-			tileAttribute("device.fanSpeed", key: "VALUE_CONTROL") {
-				attributeState "VALUE_UP", action: "raiseFanSpeed"
-				attributeState "VALUE_DOWN", action: "lowerFanSpeed"
-			}
-            
-            
-		} /*
-		
-        controlTile("levelSliderControl", "device.level", "slider", height: 1,
-             width: 2, inactiveLabel: false, range:"(0..100)") {
-    		state "level", action:"switch level.setLevel"
-		}
-            
-		standardTile("refresh", "device.switch", width: 2, height: 2, inactiveLabel: false, decoration: "flat") {
-			state "default", label: '', action: "refresh.refresh", icon: "st.secondary.refresh"
-		}
-		main "fanSpeed"
-		details(["fanSpeed", "refresh"]) */
-	}
-    
-    
-    
-   /* 
-    tiles(scale: 2) {    	
-	multiAttributeTile(name: "switch", type: "generic", width: 6, height: 4) {        	
-		tileAttribute ("fanMode", key: "PRIMARY_CONTROL") {			
-			attributeState "04", label:"aaaaHIGH", action:"off", icon:getIcon()+"fan4h.png", backgroundColor:"#79b821", nextState: "turningOff"
-			attributeState "03", label:"MED-HI", action:"off", icon:getIcon()+"fan3h.png", backgroundColor:"#79b821", nextState: "turningOff"
-			attributeState "02", label:"MED", action:"off", icon:getIcon()+"fan2h.png", backgroundColor:"#79b821", nextState: "turningOff"
-			attributeState "01", label:"LOW", action:"off", icon:getIcon()+"fan1h.png", backgroundColor:"#79b821", nextState: "turningOff"
-			attributeState "06", label:"BREEZEAAAA", action:"off", icon:getIcon()+"breeze4h_blk.png", backgroundColor:"#008B64", nextState: "turningBreezeOff"
-        	attributeState "00", label:"FAN OFF", action:"on", icon:getIcon()+"fan00h_grey.png", backgroundColor:"#ffffff", nextState: "turningOn"
-			attributeState "turningOn", action:"on", label:"TURNING ON", icon:getIcon()+"fan0h.png", backgroundColor:"#2179b8", nextState: "turningOn"
-			attributeState "turningOff", action:"off", label:"TURNING OFF", icon:getIcon()+"fan0h_grey.png", backgroundColor:"#2179b8", nextState: "turningOff"
-            attributeState "turningBreezeOff", action:"off", label:"TURNING OFF", icon:getIcon()+"breeze4h_teal.png", backgroundColor:"#2179b8", nextState: "turningOff"
-        }  
-        tileAttribute ("lightBrightness", key: "SLIDER_CONTROL") {
-			attributeState "lightBrightness", action:"lightLevel"
-		}
-	}
-    
-    standardTile("configure", "device.configure", inactiveLabel: false, decoration: "flat", width: 2, height: 2) {
-			state "configure", label:'', action:"configure", icon:"st.secondary.configure"
-	}
-        
-        
-    standardTile("refresh", "refresh", decoration: "flat", width: 2, height: 3) {
-		state "default", label:"", action:"refresh.refresh", icon:"st.secondary.refresh"
-	}  
-    valueTile("aaaaversion", "version", width:4, height:1) {
-    	state "version", label:"Ceiling Fan Parent\n"+ version()
     }
-    valueTile("FchildVer", "FchildVer", width:3, height:1) {
-    	state "FchildVer", label: "Fan Child "+'${currentValue}'+"\nGRN=OK RED=Update"
-    }
-    valueTile("LchildVer", "LchildVer", width:3, height:1) {
-    	state "LchildVer", label:"Light Child "+'${currentValue}'+"\nGRN=OK RED=Update"
-    }
-     valueTile("FchildCurr", "FchildCurr", width:1, height:1) {
-    	state "FchildCurr", label: "", backgroundColors:[
-            [value: 1, color: "#FF0000"],            
-            [value: 2, color: "#3EAE40"]
-        ]
-    }
-    valueTile("LchildCurr", "LchildCurr", width:1, height:1) {
-    	state "LchildCurr", label:"", backgroundColors:[
-            [value: 1, color: "#FF0000"],            
-            [value: 2, color: "#3EAE40"]
-        ]
-    }
-    
-    //childDeviceTiles("fanSpeeds", height: 1, width: 6)
-    childDeviceTile("fanMode1", "fanMode1", height: 2, width: 2)
-    childDeviceTile("fanMode2", "fanMode2", height: 2, width: 2)
-    childDeviceTile("fanMode3", "fanMode3", height: 2, width: 2)
-    childDeviceTile("fanMode4", "fanMode4", height: 2, width: 2)
-    childDeviceTile("fanMode6", "fanMode6", height: 2, width: 2)
-    childDeviceTile("fanLight", "fanLight", height: 2, width: 2)
-    
-	main(["switch", "configure", "fanLight", "fanMode1", "fanMode2", "fanMode6", "fanMode3", "fanMode4"])        
-	details(["switch", "configu", "fanLight", "fanMode1", "fanMode2", "fanMode6", "fanMode3", "fanMode4", "refresh", "FchildVer", "FchildCurr", "LchildVer", "LchildCurr", "version"])
-	} */
 }
 
 def parse(String description) {
@@ -294,7 +118,7 @@ def parse(String description) {
         childDevice.parse(description)
         
         //send light events to light child device and update lightBrightness attribute
-        if(event.value != "on" && event.value != "off") {
+        if(event.value != "on" && event.value != "off" && !useDimmerAsFanControl()) {
         	log.debug "sendEvent lightBrightness"
         	
             sendEvent(name: "lightBrightness", value: event.value, displayed: true, isStateChange: true) 
@@ -362,7 +186,19 @@ def fanEvents(speed) {
 	// result << createEvent(name: "level", value: speed == 99 ? 100 : speed)
 	result << createEvent(name: "fanSpeed", value: speed)
     
+    // In case dimmer is being used to control fan (Google assitant compatibility)
+    if (useDimmerAsFanControl()) {
+    	log.trace "Sending dimmer events for fan event"
+        result << sendEvent(name: "lightBrightness", value: speedToDimmerLevel(speed), displayed: true, isStateChange: true)  
+        result << sendEvent(name: "levelSliderControl", value:  speedToDimmerLevel(speed), displayed: true, isStateChange: true) 
+        result << sendEvent(name: "level", value:  speedToDimmerLevel(speed), displayed: true, isStateChange: true) 
+        result << sendEvent(name: "switch level", value:  speedToDimmerLevel(speed), displayed: true, isStateChange: true) 
+    }
+    
+    
     log.trace "fanEvents(${speed}) returning ${result}"
+    
+    
     
 	return result
 }
@@ -382,6 +218,9 @@ def updated() {
 
 def initialize() {	
 	log.info "initialize()"     
+    
+    
+    
     if(refreshChildren) { 
         deleteChildren()            
         device.updateSetting("refreshChildren", false) 
@@ -397,12 +236,6 @@ def initialize() {
 // TODO update to rename only lights and breeze, and reverse
 def updateChildLabel() {
 	log.info "updateChildLabel()"
-	/*for(i in 1..6) {   		
-    	def childDevice = getChildDevices()?.find {
-        	it.device.deviceNetworkId == "${device.deviceNetworkId}-0${i}"
-    	}                 
-        if (childDevice && i != 5) {childDevice.label = "${device.displayName} ${getFanName()["0${i}"]}"} // rename with new label
-    }*/
     
     def childDeviceL = getChildDevices()?.find {
         	it.device.deviceNetworkId == "${device.deviceNetworkId}-Light"
@@ -410,24 +243,6 @@ def updateChildLabel() {
     if (childDeviceL) {childDeviceL.label = "${device.displayName}-Light"}    // rename with new label
 } 
 
-/*
-def createFanChild() {
-	state.oldLabel = device.label    //save the label for reference if it ever changes
-	for(i in 1..6) {   		
-    	def childDevice = getChildDevices()?.find {
-        	it.device.deviceNetworkId == "${device.deviceNetworkId}-0${i}"
-    	}                 
-        if (!childDevice && i != 5) {        
-        	childDevice = addChildDevice("KOF Zigbee Fan Controller - Fan Speed Child Device", "${device.deviceNetworkId}-0${i}", null,[completedSetup: true,
-            label: "${device.displayName} ${getFanName()["0${i}"]}", isComponent: false, componentName: "fanMode${i}",
-            componentLabel: "${getFanName()["0${i}"]}", "data":["speedVal":"0${i}","parent version":version()]])        	
-           	log.info "Creating child fan mode ${childDevice}"  
-		}
-       	else {
-        	log.info "Child already exists"          
-		}
-	}
-} */
 
 
 
@@ -655,35 +470,25 @@ def lightLevel(val) {
  * Called from APP when sliding light dimmer
  */
 def setLevel(val, rate = null, device=null) {
-	log.debug "setLevel(${val}, ${rate})"
-	log.info "Adjusting Light Brightness via setlevel on parent: {$val}" 
+	log.debug "setLevel(val=${val}, rate=${rate},device=${device})"
     
-    // sendEvent(name:"level",value: val)
-   
-	def isDeviceOn = val?.toInteger() > 1
-    def cmds = zigbee.setLevel(val.toInteger(), 1) + refresh() // + refresh() (isDeviceOn ? zigbee.on() : []) 
-    
-    log.debug "cmds {$cmds}"
-    
-    return cmds
-    
-    /*
-    log.debug "Loading childlights"
-    def childDevice = getChildDevices()?.find {
-        	it.device.deviceNetworkId == "${device.deviceNetworkId}-Light"
+    def cmds
+    if (device != null || !useDimmerAsFanControl() ) {
+        // Dimmer acts on lights as usual
+    	log.info "Adjusting Light Brightness via setlevel on parent: {$val}" 
+    	def isDeviceOn = val?.toInteger() > 1
+    	cmds = zigbee.setLevel(val.toInteger(), 1) + refresh()
     }
-    if (childDevice) {
-    	log.debug "Sending event to child"
-        log.debug childDevice
-    	//childDevice.sendEvent(name: "device.value", value: val)
-        // childDevice.sendEvent(name: "device.switch", value: "on", isStatusChange: true)
-        childDevice.sendEvent(name: "switch", value: isDeviceOn? "on": "off", isStatusChange: true)
-        childDevice.sendEvent(name: "value", value: val, isStatusChange: true)
+    else {
+    	log.info "Slider acting for fan control on setLevel" 
+    	// Dimmer acts on fan control
+		cmds = setFanSpeed(dimmerLevelToSpeed(val?.toInteger()))
         
     }
+
+    log.debug "setLevel(val=${val}, rate=${rate},device=${device}) return ${cmds}"
     
-    
-    return zigbee.command(0x0006, 0x01) */
+    return cmds
 }
 
 def poll() {
@@ -755,67 +560,43 @@ def getChildVer() {
 	}
 }
 
-
-/*
-def installed() {
-	sendEvent(name: "checkInterval", value: 2 * 15 * 60 + 2 * 60, displayed: false, data: [protocol: "zwave", hubHardwareId: device.hub.hardwareID, offlinePingable: "1"])
-	response(refresh())
-}*/
-
-/*
-
-def zwaveEvent(physicalgraph.zwave.commands.basicv1.BasicReport cmd) {
-	fanEvents(cmd)
+/**
+ * Returns true if  1, dimmer will control fan speed (for Google assistant compatibility) 
+ */
+def useDimmerAsFanControl() {
+	log.trace("useDimmerAsFanControl(): ${dimmerAsFanControl == 1}")
+    
+    // TODO using number since bool prefs are not saving
+	return dimmerAsFanControl == 1
 }
 
-def zwaveEvent(physicalgraph.zwave.commands.basicv1.BasicSet cmd) {
-	fanEvents(cmd)
+/**
+ * Returns a dimmer value for a given speed
+ *  - 0 to 24 is speed 25 (turn off)
+ *  - 24 to 49 is speed 1 (low)
+ *  - 50 to 74 is speed 2 (medium)
+ *  - 75 to 100 is speed 3 (high)
+ */
+def speedToDimmerLevel(speed) {
+	return speed*25
 }
 
-def zwaveEvent(physicalgraph.zwave.commands.switchmultilevelv1.SwitchMultilevelReport cmd) {
-	fanEvents(cmd)
+/**
+ * Returns a fan value for a given dimmer value
+ *  - 0 to 24 is speed 25 (turn off)
+ *  - 24 to 49 is speed 1 (low)
+ *  - 50 to 74 is speed 2 (medium)
+ *  - 75 to 100 is speed 3 (high)
+ */
+def dimmerLevelToSpeed(dimmerLevel) {
+	if (dimmerLevel == null) {
+    	dimmerLevel = 0
+    }
+	return  Math.round(dimmerLevel/25)
 }
 
-def zwaveEvent(physicalgraph.zwave.commands.switchmultilevelv1.SwitchMultilevelSet cmd) {
-	fanEvents(cmd)
-}
 
-def zwaveEvent(physicalgraph.zwave.commands.hailv1.Hail cmd) {
-	log.debug "received hail from device"
-}
-
-def zwaveEvent(physicalgraph.zwave.Command cmd) {
-	// Handles all Z-Wave commands we aren't interested in
-	log.debug "Unhandled: ${cmd.toString()}"
-	[:]
-} */
-
-/*
-def fanEvents(physicalgraph.zwave.Command cmd) {
-	def rawLevel = cmd.value as int
-	def result = []
-
-	if (0 <= rawLevel && rawLevel <= 100) {
-		def value = (rawLevel ? "on" : "off")
-		result << createEvent(name: "switch", value: value, isStateChange: true)
-		result << createEvent(name: "level", value: rawLevel == 99 ? 100 : rawLevel, isStateChange: true)
-
-		def fanLevel = 0
-
-		// The GE, Honeywell, and Leviton treat 33 as medium, so account for that
-		if (1 <= rawLevel && rawLevel <= 32) {
-			fanLevel = 1
-		} else if (33 <= rawLevel && rawLevel <= 66) {
-			fanLevel = 2
-		} else if (67 <= rawLevel && rawLevel <= 100) {
-			fanLevel = 3
-		}
-		result << createEvent(name: "fanSpeed", value: fanLevel, isStateChange: true)
-	}
-
-	return result
-}*/
-
+    
 
 def raiseFanSpeed() {
 	setFanSpeed(Math.min((device.currentValue("fanSpeed") as Integer) + 1, 3))
