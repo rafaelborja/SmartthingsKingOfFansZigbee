@@ -9,6 +9,23 @@ You can find the complete fan (including the controller) on the following links:
 This device handler has a main device for Fan Control and a child device for light control
 ![Device handler on Smartthings app](images/screenshots/screenshots.jpg)
 
+### Control fan using Google Assistant
+
+If you are using Google assistant you can set option dimmerAsFanControl to true to control fan speed using light dimmer.
+Google asistant does not properly support fan speed dial, showing it as a light dimmer instead. When this option is activiated you can set fan speed with the command in Google Assistant as "Set <FAN NAME> speed to <0 to 100>", where:
+  - 0 to 24 is speed 25 (turn off),
+  - 24 to 49 is speed 1 (low),
+  - 50 to 74 is speed 2 (medium),
+  - 75 to 100 is speed 3 (high),
+
+
+You can still use the on/off button as usual (fan on/off). To control light level you must use child light device (shown as a regular light)"
+
+![Google Home demo](images/screenshots/google_home_fan_control.gif)
+
+Note that Google Home sees the fan dimmer as a "brightness", but the device handler respond as a fan control.
+
+
 ### Validation scenario 
 This device handler was tested using Samsung Connect Home Pro (Smartthings V2 Hub) with Firmware version	000.027.00010 in a set up with +10 Zigbee devices. I used two King Of Fans, Inc. model HDC52EastwindFan at the same network.
 
