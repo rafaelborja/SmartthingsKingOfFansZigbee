@@ -12,7 +12,7 @@ This device handler has a main device for Fan Control and a child device for lig
 ### Google Assistant fan Control
 
 If you are using Google assistant you can set option dimmerAsFanControl to true to control fan speed using light dimmer.
-Google asistant does not properly support fan speed dial, showing it as a light dimmer instead. When this option is activiated you can set fan speed with the command in Google Assistant as "Set <FAN NAME> speed to <0 to 100>", where:
+Google assistant does not properly support fan speed dial, showing it as a light dimmer instead. When this option is activated you can set fan speed with the command in Google Assistant as "Set <FAN NAME> speed to <0 to 100>", where:
   - 0 to 24 is speed 25 (turn off),
   - 24 to 49 is speed 1 (low),
   - 50 to 74 is speed 2 (medium),
@@ -21,20 +21,27 @@ Google asistant does not properly support fan speed dial, showing it as a light 
 ![Dimmer as Fan Control settings](images/screenshots/set_dimmer_as_fan_control_settings.jpg)
 
 
-You can still use the on/off button as usual (fan on/off). To control light level you must use child light device (shown as a regular light)
+Note that you can still use the on/off button as usual (fan on/off). To control light level, you must use child light device (shown as a regular light).
 
-![Smartthings Device Settings - Dimmer as Fan Control](images/screenshots/smartthings_dimmer_as_fan_control_demo.gif) ![Google Home demo](images/screenshots/google_home_fan_control.gif) 
+When dimmerAsFanControl option is activated, fan slider and dimmer will sync when any of them changes values as seen in the following animation: 
 
-Note that Google Home sees the fan dimmer as a "brightness", but the device handler respond as a fan control.
+![Smartthings Device Settings - Dimmer as Fan Control](images/screenshots/smartthings_dimmer_as_fan_control_demo.gif) 
+
+Also note that Google Home sees the fan dimmer as a "brightness", but the device handler respond as a fan control. When you use the command "Ok Google, set fan to 15%", google you turn on fan level 1 and respond "Changing **brightness** to 15%" instead of "Changing **fan level** to 15%". You can also turn the fan on and of using the command "Ok Google, turn fan ON/OFF".
+
+![Google Home demo](images/screenshots/google_home_fan_control.gif)
+
+To control lights device child, simply use the command "Ok Google, set Fan **Light** brightness to 30%".
 
 
 ### Validation scenario 
 This device handler was tested using Samsung Connect Home Pro (Smartthings V2 Hub) with Firmware version	000.027.00010 in a set up with +10 Zigbee devices. I used two King Of Fans, Inc. model HDC52EastwindFan at the same network.
+Google assistant commands were validated using Google Home app  v 2.19.1.18 running under Android Oreo, Google Nest mini running  firmware 191160 and Google Nest Hub running  firmware 191160. All commands were tested using US-English language set.
 
 ### Known issues
 - Random delays to update child device.
 - Excess message logging and events generated
-- Child light device shows as off-line
+- Child light device shows as off-line.
 
 ### Install Instructions
 
@@ -52,8 +59,6 @@ dcoffing made an amazing work with the legacy device handler https://github.com/
 This device handler has also a simplified interface and less child devices (no child devices for the fan, only one for the light).
 
 This device handler would not be possible with all work and effort from dcoffing and all that contributed to the legacy device handler.
-
-
 
 ### FAQ
 #### Why the fan buttons devices are gone?
