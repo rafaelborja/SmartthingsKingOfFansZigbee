@@ -23,7 +23,7 @@
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  */
-def version() {"ver 0.2.18"}					//update as needed
+def version() {"ver 0.2.18"}
 
 
 def currVersions(child) {						//Let's user know if running the child versions that corresponds to this parent version
@@ -32,9 +32,7 @@ def currVersions(child) {						//Let's user know if running the child versions t
 }
 
 metadata {
-	definition(name: "King of Fans Zigbee Fan Controller", namespace: "rafaelborja", author: "Rafael Borja", ocfDeviceType: "oic.d.fan", genericHandler: "Zigbee") {
-    // definition (cstHandler: true, name: "AKOF Zigbee Fan Controller 1", namespace: "smartthings", author: "Stephan Hackett, Ranga Pedamallu, Dale Coffing, Rafael Borja",
-    //ocfDeviceType: "oic.d.fan", genericHandler: "Zigbee") {
+	definition(name: "King of Fans Zigbee Fan Controller", namespace: "rafaelborja", author: "Rafael Borja", ocfDeviceType: "oic.d.fan", genericHandler: "Zigbee") {    
     	capability "Switch Level"
 		capability "Switch"
 		capability "Fan Speed"
@@ -100,7 +98,7 @@ def parse(String description) {
 	log.info "parse($description)"
     def event = zigbee.getEvent(description)
     if (event) {
-    	"Sample 0104 0006 01 01 0000 00 D42D 00 00 0000 01 01 010086"
+    	// "Sample 0104 0006 01 01 0000 00 D42D 00 00 0000 01 01 010086"
         
         log.info "Parse description ${description}"
     	log.info "Light event detected on controller (event): ${event}"
@@ -112,15 +110,18 @@ def parse(String description) {
         event.displayed = true
         event.isStateChange = true
         
+        // TODO find right event
         childDevice.createAndSendEvent(event)
-        childDevice.createAndSendEvent(description)
+        // childDevice.createAndSendEvent(description)
         childDevice.sendEvent(event)
-        childDevice.parse(description)
+        // TODO not needed? childDevice.parse(description)
         
         //send light events to light child device and update lightBrightness attribute
         if(event.value != "on" && event.value != "off" && !useDimmerAsFanControl()) {
         	log.debug "sendEvent lightBrightness"
         	
+            //  TODO remove unused events
+        	// TODO refactor to a single method
             sendEvent(name: "lightBrightness", value: event.value, displayed: true, isStateChange: true) 
             sendEvent(name: "levelSliderControl", value: event.value, displayed: true, isStateChange: true) 
             sendEvent(name: "level", value: event.value, displayed: true, isStateChange: true) 
@@ -131,9 +132,9 @@ def parse(String description) {
         }
     }
 	else {
-     	"Sample: 0104 0006 01 01 0000 00 D42D 00 00 0000 07 01 86000100"
-        "Sample: 0104 0006 01 01 0000 00 D42D 00 00 0000 07 01 00"
-        "Sample: D42D0102020800003000, dni: D42D, endpoint: 01, cluster: 0202, size: 8, attrId: 0000, result: success, encoding: 30, value: 00"
+     	// "Sample: 0104 0006 01 01 0000 00 D42D 00 00 0000 07 01 86000100"
+        // "Sample: 0104 0006 01 01 0000 00 D42D 00 00 0000 07 01 00"
+        // "Sample: D42D0102020800003000, dni: D42D, endpoint: 01, cluster: 0202, size: 8, attrId: 0000, result: success, encoding: 30, value: 00"
        	log.info "Fan event detected on controller"
 		def map = [:]
 		if (description?.startsWith("read attr -")) {
@@ -181,7 +182,7 @@ def speedToLabel(speed) {
 def fanEvents(speed) {
 	log.trace "fanEvents(${speed})"
     
-	def value = (speed ? "on" : "off")
+	def value = (speed ? "on" : "off") // TODO review this portion as it is sensing light off to child device when changing dimmer value
 	def result = [createEvent(name: "switch", value: value)]
 	// result << createEvent(name: "level", value: speed == 99 ? 100 : speed)
 	result << createEvent(name: "fanSpeed", value: speed)
@@ -189,6 +190,8 @@ def fanEvents(speed) {
     // In case dimmer is being used to control fan (Google assitant compatibility)
     if (useDimmerAsFanControl()) {
     	log.trace "Sending dimmer events for fan event"
+        //  TODO remove unused events
+        // TODO refactor to a single method
         result << sendEvent(name: "lightBrightness", value: speedToDimmerLevel(speed), displayed: true, isStateChange: true)  
         result << sendEvent(name: "levelSliderControl", value:  speedToDimmerLevel(speed), displayed: true, isStateChange: true) 
         result << sendEvent(name: "level", value:  speedToDimmerLevel(speed), displayed: true, isStateChange: true) 
@@ -197,8 +200,6 @@ def fanEvents(speed) {
     
     
     log.trace "fanEvents(${speed}) returning ${result}"
-    
-    
     
 	return result
 }
@@ -233,7 +234,6 @@ def initialize() {
     }
 }
 
-// TODO update to rename only lights and breeze, and reverse
 def updateChildLabel() {
 	log.info "updateChildLabel()"
     
@@ -242,9 +242,6 @@ def updateChildLabel() {
     }
     if (childDeviceL) {childDeviceL.label = "${device.displayName}-Light"}    // rename with new label
 } 
-
-
-
 
 
 def createLightChild() {
@@ -367,7 +364,8 @@ def on (physicalgraph.device.cache.DeviceDTO child) {
  */
 def ping(physicalgraph.device.cache.DeviceDTO child) {
 	log.debug "ping(${child})"   
-	return ping() + child.refresh()
+    
+    return ping()
 }
 
 def on() {
@@ -448,7 +446,7 @@ void childOff(String dni) {
 def lightLevel(val) {
 	log.debug "lightLevel(${val})"
     
-    zigbee.setLevel(val) + (val?.toInteger() > 1 ? zigbee.on() : []) 
+    zigbee.setLevel(val) + (val?.toInteger() >= 1 ? zigbee.on() : []) 
     sendEvent(name:"level",value: val)
     
     log.debug "Loading childlights"
@@ -476,7 +474,7 @@ def setLevel(val, rate = null, device=null) {
     if (device != null || !useDimmerAsFanControl() ) {
         // Dimmer acts on lights as usual
     	log.info "Adjusting Light Brightness via setlevel on parent: {$val}" 
-    	def isDeviceOn = val?.toInteger() > 1
+    	def isDeviceOn = val?.toInteger() >= 1
     	cmds = zigbee.setLevel(val.toInteger(), 1) + refresh()
     }
     else {
@@ -506,32 +504,11 @@ def setFanSpeed(speed) {
     return cmds
 }
 
-/*
-def fanSync(whichFan) {	
-	def children = getChildDevices()
-   	children.each {child->
-       	def childSpeedVal = child.getDataValue('speedVal')
-        if(childSpeedVal == whichFan) {	//send ON event to corresponding child fan
-           	child.sendEvent(name:"switch",value:"on")
-            child.sendEvent(name:"fanSpeed", value:"on${childSpeedVal}")	//custom icon code
-            sendEvent(name:"switch",value:"on") //send ON event to Fan Parent
-        }
-        else {            	
-           	if(childSpeedVal!=null){ 
-           		//log.info childSpeedVal
-           		child.sendEvent(name:"switch",value:"off")	//send OFF event to all other child fans
-                child.sendEvent(name:"fanSpeed", value:"off${childSpeedVal}")	//custom icon code
-           	}
-        }
-   	}
-    if(whichFan == "00") sendEvent(name:"switch",value:"off") //send OFF event to Fan Parent
-}
-*/
-
 def ping() {	
 	log.debug("ping()")
     return zigbee.onOffRefresh()
 }
+
 
 def refresh(physicalgraph.device.cache.DeviceDTO child=null) {	
 	log.info "refresh($child) called " 
@@ -539,25 +516,6 @@ def refresh(physicalgraph.device.cache.DeviceDTO child=null) {
 	return zigbee.onOffRefresh() + zigbee.levelRefresh() + zigbee.readAttribute(0x0202, 0x0000) + zigbee.readAttribute(0x0006, 0x0000) +
     zigbee.readAttribute(0x0202, 0x0000) + zigbee.readAttribute(0x0202, 0x0001) + zigbee.readAttribute(0x0006, 0x0001) + zigbee.readAttribute(0x0006, 0x0000) +
     zigbee.readAttribute(0x0008, 0x0004) + zigbee.readAttribute(0x0008, 0x0004)
-}
-
-
-def getChildVer() {
-	def FchildDevice = getChildDevices()?.find {
-        	it.device.deviceNetworkId == "${device.deviceNetworkId}-01"
-    	}                 
-	if(FchildDevice){	//find a fan device, 1. get version info and store in FchildVer, 2. check child version is current and set color accordingly
-    	sendEvent(name:"FchildVer", value: FchildDevice.version())	
-    	FchildDevice.version() != currVersions("fan")?sendEvent(name:"FchildCurr", value: 1):sendEvent(name:"FchildCurr", value: 2)
-    }
-    
-    def LchildDevice = getChildDevices()?.find {
-        	it.device.deviceNetworkId == "${device.deviceNetworkId}-Light"
-    	}                 
-	if(LchildDevice) {	    //find the light device, get version info and store in LchildVer    
-    	sendEvent(name:"LchildVer", value: LchildDevice.version())
-    	LchildDevice.version() != currVersions("light")?sendEvent(name:"LchildCurr", value: 1):sendEvent(name:"LchildCurr", value: 2)
-	}
 }
 
 /**

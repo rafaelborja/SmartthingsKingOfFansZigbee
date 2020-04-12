@@ -99,7 +99,7 @@ void refresh() {
 def createAndSendEvent(map) {
     log.debug "child[ ${device.deviceNetworkId} ].createAndSendEvent($map)"
     	results.each { name, value ->
-    		sendEvent(name: name, value: value)
+    		sendEvent(name: name, value: value, displayed: true, isStateChange: true) // check if displayed: true, isStateChange: true is needed
   	}
   	return null
 }
