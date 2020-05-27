@@ -47,6 +47,8 @@ Google assistant commands were validated using Google Home app  v 2.19.1.18 runn
 
 Follow [Smartthings Git Hub Integration Guide](https://docs.smartthings.com/en/latest/tools-and-ide/github-integration.html), using user rafaelborja and repository SmartthingsKingOfFansZigbee.
 
+After creating the device handlers, you must change/set the Fan device type to "King of Fans Zigbee Fan Controller" on the device tab on IDE. You can do so by clicking on edit over the device and selecting the device from the list.
+
 
 **Developer note: Please feel free to try Smartthings Git Hub Integration and validate if this issue is specific to my installation. **
 
