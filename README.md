@@ -50,7 +50,7 @@ Follow [Smartthings Git Hub Integration Guide](https://docs.smartthings.com/en/l
 
 **Developer note: Please feel free to try Smartthings Git Hub Integration and validate if this issue is specific to my installation. **
 
-You can also create a new device handler from code copying and pasting [child-contact-sensor device handler](devicetypes/rafaelborja/child-contact-sensor.src/child-contact-sensor.groovy) and [child-contact-sensor device handler]( devicetypes/rafaelborja/august-lock-pro-zwave-lock-with-doorsense.src/august-lock-pro-zwave-lock-with-doorsense.groovy) source code
+You can also create a new device handler from code copying and pasting [king-of-fans-zigbee-fan-controller.groovy](https://raw.githubusercontent.com/rafaelborja/SmartthingsKingOfFansZigbee/master/devicetypes/rafaelborja/king-of-fans-zigbee-fan-controller.src/king-of-fans-zigbee-fan-controller.groovy) and [king-of-fans-zigbee-fan-light-child-device.src](https://raw.githubusercontent.com/rafaelborja/SmartthingsKingOfFansZigbee/master/devicetypes/rafaelborja/king-of-fans-zigbee-fan-light-child-device.src/king-of-fans-zigbee-fan-light-child-device.groovy) source code
 
 ### A note on https://github.com/dcoffing/KOF-CeilingFan
 
