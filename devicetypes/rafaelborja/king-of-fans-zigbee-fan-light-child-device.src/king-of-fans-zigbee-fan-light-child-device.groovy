@@ -13,26 +13,6 @@
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  */
- def version() {return "ver 0.2.18a"}
-/*
-    a- added valueTile for rangeValue; forced to use 2x2 or bug in device handler makes font unreadably small
-       so modified controlTile 4x2 to match up rangeValue tile size, shorten ver to increase font in tile  
- 05/15 pull request merge with Stephan and Ranga changes, to allow flat look in parent, changed from multiAttribute to Standard/Control Tile functionality
- 05/10 decoration: "flat" added to tile for consistancy across all childs
- 05/05 edit Zigbee to proper ZigBee trademark
- 05/04 clean up display in iOS child version, smaller text and center version
- 05/03 tweak to icons for ON to match the lighter grey LED look
- 05/02 replaced blue rays on icon to be grey when TurningOnOff
-    b- changed light TurningON/OFF icon to light_blue 
-    a- changed light ON icon from light_blue to lightH for Stephan  
- 05/01 added version tile for iOS child device view, light icon ON with blue rays
- 04/30a move Stephack latest changes over in a copy/paste; change namespace
- 04/29 larger matching icon; used URL shortcut https://cdn.rawgit.com/ and located to /resources/images/
- 04/26 moved icons to KOF repo and renamed for final release
- 04/20 modified version tile 
- 04/19 added version tile to help in troubleshooting with users
- 2017 Year
-*/
 metadata {
 	definition (name: "King of Fans Zigbee Fan - Light Child Device", namespace: "rafaelborja", ocfDeviceType:"oic.d.light", author: "Rafael Borja", vid: "generic-dimmer") {
 		capability "Switch"
@@ -43,9 +23,9 @@ metadata {
         
         command "off"
         command "on"
-        
 	}
 
+	// TODO Is fingerprint needed for child device?
     //    Zemismart HGZB-42
     fingerprint profileId: "C05E", deviceId: "0000", inClusters: "0000, 0003, 0004, 0005, 0006, 0008", outClusters: "0019", manufacturer: "3A Smart Home DE", model: "LXN-2S27LX1.0", deviceJoinName: "ZigBee Smart Switch"
     fingerprint profileId: "C05E", deviceId: "0000", inClusters: "0000, 0003, 0004, 0005, 0006, 0008", outClusters: "0019", manufacturer: "FeiBit", model: "FNB56-ZSW02LX2.0", deviceJoinName: "ZigBee Smart Switch"
@@ -86,7 +66,6 @@ void off() {
     sendEvent(name: "device.switch", value: "off", displayed: true, isStateChange: true)
     
 	parent.off(device)
-    
 }
 
 void refresh() {
@@ -106,12 +85,6 @@ def createAndSendEvent(map) {
 
 def parse(description) {
 	log.debug "PARSE IN Child: $description"
-    
-    //def event = zigbee.getEvent(description)
-    //sendEvent(description)
-    // return sendEvent(event)
-    
-    
 }
 
 def setLevel(value, rate = 10) { parent.setLevel(value, rate, device) }

@@ -23,13 +23,6 @@
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  */
-def version() {"ver 0.2.18"}
-
-
-def currVersions(child) {						//Let's user know if running the child versions that corresponds to this parent version
- if(child=="fan")   {return "ver 0.2.18"}	//manually enter the version of the FAN child that matches the parent version above
- if(child=="light") {return "ver 0.2.18a"}	//manually enter the version of the LIGHT child that matches the parent version above
-}
 
 metadata {
 	definition(name: "King of Fans Zigbee Fan Controller", namespace: "rafaelborja", author: "Rafael Borja", ocfDeviceType: "oic.d.fan", genericHandler: "Zigbee") {    
@@ -88,7 +81,7 @@ metadata {
                  \n\
                  You can still use the on/off button as usual (fan on/off). To control light level you must use child light device (shown as a regular light)")
                  
-        	input "dimmerAsFanControl", "number", title: "Use dimmer to control fan? (type 1 to yes, empty to no)", displayDuringSetup: true
+        	input "dimmerAsFanControl", "enum", title: "Use dimmer to control fan?", options: ["1":"Yes", "0":"No"], displayDuringSetup: true, default: "0"
        // }
        
     }
@@ -252,8 +245,7 @@ def createLightChild() {
     if (!childDevice) {  
     
 		childDevice = addChildDevice("King of Fans Zigbee Fan - Light Child Device", "${device.deviceNetworkId}-Light", null,[completedSetup: true,
-        label: "${device.displayName} Light" ]) /*, isComponent: false, componentName: "fanLight",
-        componentLabel: "Light", "data":["parent version":version()]])        */
+        label: "${device.displayName} Light" ]) /*, isComponent: false, componentName: "fanLight" */
         log.info "Creating child light ${childDevice}" 
     }
 	else {
