@@ -69,19 +69,12 @@ metadata {
     
     preferences {
         // section("Google assistant fan control using dimmer") {
-        input ( type: "paragraph", element: "paragraph", title: "Google assistant fan control using dimmer", description: "\
-        		If you are using Google assistant you can set this option to true to control fan speed using light dimmer.\
-                Google asistant does not properly support fan speed dial, showing it as a light dimmer instead.\
-                When this option is activiated you can set fan speed with the command \"Set <FAN NAME> speed to <0 to 100>\", where:\n\
-                 - 0 to 24 is speed 25 (turn off),\n\
-                 - 24 to 49 is speed 1 (low),\n\
-                 - 50 to 74 is speed 2 (medium),\n\
-                 - 75 to 100 is speed 3 (high),\n\
-                 \n\
-                 \n\
-                 You can still use the on/off button as usual (fan on/off). To control light level you must use child light device (shown as a regular light)")
+        input ( type: "paragraph", element: "paragraph", title: "Fan control using dimmer", description: "\
+        		Some devices, such as Google Home or Alexa can't control the fan speed via mode select.\
+        		If you are using such a decive, you can use the dimmer to control the fan speed.\
+                You can still use the on/off button as usual (fan on/off). To control light level you must use child light device (shown as a regular light)")
                  
-        	input "dimmerAsFanControl", "enum", title: "Use dimmer to control fan?", options: ["1":"Yes", "0":"No"], displayDuringSetup: true, default: "0"
+        	input "dimmerControl", "enum", title: "What should the dimmer control?", options: ["Light", "Fan"], displayDuringSetup: true, defaultValue: "Light"
        // }
        
     }
@@ -472,7 +465,7 @@ def setLevel(val, rate = null, device=null) {
     else {
     	log.info "Slider acting for fan control on setLevel" 
     	// Dimmer acts on fan control
-		cmds = setFanSpeed(dimmerLevelToSpeed(val?.toInteger()))
+		cmds = setFanSpeed(dimmerLevelToSpeed(val?.toInteger())) + refresh()
         
     }
 
@@ -514,10 +507,9 @@ def refresh(physicalgraph.device.cache.DeviceDTO child=null) {
  * Returns true if  1, dimmer will control fan speed (for Google assistant compatibility) 
  */
 def useDimmerAsFanControl() {
-	log.trace("useDimmerAsFanControl(): ${dimmerAsFanControl == 1}")
+	log.trace("useDimmerAsFanControl(): ${settings.dimmerControl}")
     
-    // TODO using number since bool prefs are not saving
-	return dimmerAsFanControl == 1
+	return settings.dimmerControl == "Fan"
 }
 
 /**
