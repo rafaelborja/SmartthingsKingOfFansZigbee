@@ -504,7 +504,7 @@ def refresh(physicalgraph.device.cache.DeviceDTO child=null) {
 }
 
 /**
- * Returns true if  1, dimmer will control fan speed (for Google assistant compatibility) 
+ * Returns true if dimmer will control fan speed (for Google Assistant, Alexa compatibility) 
  */
 def useDimmerAsFanControl() {
 	log.trace("useDimmerAsFanControl(): ${settings.dimmerControl}")
