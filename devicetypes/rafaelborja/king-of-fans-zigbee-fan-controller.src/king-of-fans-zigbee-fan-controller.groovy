@@ -94,7 +94,7 @@ def parse(String description) {
             it.device.deviceNetworkId == "${device.deviceNetworkId}-Light" 
         }          
         event.displayed = true
-        event.isStateChange = true
+        event.isStateChange = childDevice.isStateChange(event)
         
         // TODO find right event
         childDevice.createAndSendEvent(event)
@@ -499,7 +499,7 @@ def refresh(physicalgraph.device.cache.DeviceDTO child=null) {
 	log.info "refresh($child) called " 
     
 	return zigbee.onOffRefresh() + zigbee.levelRefresh() + zigbee.readAttribute(0x0202, 0x0000) + zigbee.readAttribute(0x0006, 0x0000) +
-    zigbee.readAttribute(0x0202, 0x0000) + zigbee.readAttribute(0x0202, 0x0001) + zigbee.readAttribute(0x0006, 0x0001) + zigbee.readAttribute(0x0006, 0x0000) +
+    zigbee.readAttribute(0x0202, 0x0000) + zigbee.readAttribute(0x0202, 0x0001) + /* zigbee.readAttribute(0x0006, 0x0001) + zigbee.readAttribute(0x0006, 0x0000) + */
     zigbee.readAttribute(0x0008, 0x0004) + zigbee.readAttribute(0x0008, 0x0004)
 }
 
