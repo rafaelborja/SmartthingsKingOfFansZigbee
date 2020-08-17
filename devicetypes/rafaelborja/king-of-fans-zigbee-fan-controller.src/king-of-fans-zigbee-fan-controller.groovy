@@ -509,7 +509,8 @@ def refresh(physicalgraph.device.cache.DeviceDTO child=null) {
 def useDimmerAsFanControl() {
 	log.trace("useDimmerAsFanControl(): ${settings.dimmerControl}")
     
-	return settings.dimmerControl == "Fan"
+	// Check fro dimmerAsFanControl == 1 for legacy reasons. TODO - Remove in future versions
+	return settings.dimmerControl == "Fan" || dimmerAsFanControl == 1
 }
 
 /**
