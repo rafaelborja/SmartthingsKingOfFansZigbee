@@ -74,13 +74,27 @@ void refresh() {
 	parent.childRefresh(device.deviceNetworkId)
 }
 
-
-def createAndSendEvent(map) {
-    log.debug "child[ ${device.deviceNetworkId} ].createAndSendEvent($map)"
-    	results.each { name, value ->
-    		sendEvent(name: name, value: value, displayed: true, isStateChange: true) // check if displayed: true, isStateChange: true is needed
-  	}
-  	return null
+/**
+ * Returns true if event map values differs from devices values.
+ */
+def isStateChange(event) {
+	log.trace "[isStateChange](${eventChange})"
+    
+	def eventChange = true;
+	switch(event['name']) {
+    	case "switch": 
+        	 eventChange = (event['value'] != null && event['value'] != device.currentValue("switch"))
+        	break
+        case "level":
+        	eventChange = (event['value'] != null && event['value'] != device.currentValue("level"))
+        	break
+        default:
+        	log.debug "[isStateChange] Unknown event: ${event}"
+            break;
+    }
+    
+    log.trace "[isStateChange] ${eventChange}"
+    return eventChange
 }
 
 def parse(description) {

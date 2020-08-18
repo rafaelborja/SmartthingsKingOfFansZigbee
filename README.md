@@ -35,8 +35,14 @@ To control lights device child, simply use the command "Ok Google, set Fan **Lig
 
 
 ### Validation scenario 
+#### V.01
 This device handler was tested using Samsung Connect Home Pro (Smartthings V2 Hub) with Firmware version	000.027.00010 in a set up with +10 Zigbee devices. I used two King Of Fans, Inc. model HDC52EastwindFan at the same network.
 Google assistant commands were validated using Google Home app  v 2.19.1.18 running under Android Oreo, Google Nest mini running  firmware 191160 and Google Nest Hub running  firmware 191160. All commands were tested using US-English language set.
+
+#### V.02
+This device handler was tested using SmartThings WiFi, Plume US (Smartthings V3 Hub)  with Firmware version	000.029.00009 in a set up with +10 Zigbee devices. I used two King Of Fans, Inc. model HDC52EastwindFan at the same network.
+Google assistant commands were validated using Google Home app  v 2.26.1.8 running under Android Oreo, Google Nest mini running  firmware 191160 and Google Nest Hub running  firmware 191160. All commands were tested using US-English language set.
+
 
 ### Known issues
 - Random delays to update child device.
