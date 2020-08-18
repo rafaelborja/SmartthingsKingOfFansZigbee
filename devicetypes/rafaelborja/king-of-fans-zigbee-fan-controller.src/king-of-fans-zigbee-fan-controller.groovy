@@ -69,19 +69,12 @@ metadata {
     
     preferences {
         // section("Google assistant fan control using dimmer") {
-        input ( type: "paragraph", element: "paragraph", title: "Google assistant fan control using dimmer", description: "\
-        		If you are using Google assistant you can set this option to true to control fan speed using light dimmer.\
-                Google asistant does not properly support fan speed dial, showing it as a light dimmer instead.\
-                When this option is activiated you can set fan speed with the command \"Set <FAN NAME> speed to <0 to 100>\", where:\n\
-                 - 0 to 24 is speed 25 (turn off),\n\
-                 - 24 to 49 is speed 1 (low),\n\
-                 - 50 to 74 is speed 2 (medium),\n\
-                 - 75 to 100 is speed 3 (high),\n\
-                 \n\
-                 \n\
-                 You can still use the on/off button as usual (fan on/off). To control light level you must use child light device (shown as a regular light)")
+        input ( type: "paragraph", element: "paragraph", title: "Fan control using dimmer", description: "\
+        		Some devices, such as Google Home or Alexa can't control the fan speed via mode select.\
+        		If you are using such a decive, you can use the dimmer to control the fan speed.\
+                You can still use the on/off button as usual (fan on/off). To control light level you must use child light device (shown as a regular light)")
                  
-        	input "dimmerAsFanControl", "enum", title: "Use dimmer to control fan?", options: ["1":"Yes", "0":"No"], displayDuringSetup: true, default: "0"
+        	input "dimmerControl", "enum", title: "What should the dimmer control?", options: ["Light", "Fan"], displayDuringSetup: true, defaultValue: "Light"
        // }
        
     }
@@ -89,7 +82,10 @@ metadata {
 
 def parse(String description) {
 	log.info "parse($description)"
+    // TODO description 'on/off: 1' or 'on/off: 0' can represent both light on/of or power on/off on remote control. After this event fan speed and state must be retrieved and updated
     def event = zigbee.getEvent(description)
+    
+
     if (event) {
     	// "Sample 0104 0006 01 01 0000 00 D42D 00 00 0000 01 01 010086"
         
@@ -101,13 +97,9 @@ def parse(String description) {
             it.device.deviceNetworkId == "${device.deviceNetworkId}-Light" 
         }          
         event.displayed = true
-        event.isStateChange = true
+        event.isStateChange = childDevice.isStateChange(event)
         
-        // TODO find right event
-        childDevice.createAndSendEvent(event)
-        // childDevice.createAndSendEvent(description)
         childDevice.sendEvent(event)
-        // TODO not needed? childDevice.parse(description)
         
         //send light events to light child device and update lightBrightness attribute
         if(event.value != "on" && event.value != "off" && !useDimmerAsFanControl()) {
@@ -322,13 +314,6 @@ def off (physicalgraph.device.cache.DeviceDTO child) {
     def childDevice = getChildDevices()?.find {
         	it.device.deviceNetworkId == "${device.deviceNetworkId}-Light"
     }
-    if (childDevice) {
-    	log.debug "Sending event to child $childDevice"
-        log.debug childDevice
-    	childDevice.createAndSendEvent(name: "switch", value: "off", displayed: true, isStateChange: true) // childDevice.sendEvent(name: "device.switch", value: "off", displayed: true, isStateChange: true) + 
-        	// childDevice.sendEvent(name: "switch", value: "off", displayed: true, isStateChange: true) +
-        	// childDevice.createAndSendEvent(name: "switch", value: "off", displayed: true, isStateChange: true)
-    }
     
     lightOff(getEndpoint(child))
 }
@@ -338,14 +323,6 @@ def on (physicalgraph.device.cache.DeviceDTO child) {
     
     def childDevice = getChildDevices()?.find {
         	it.device.deviceNetworkId == "${device.deviceNetworkId}-Light"
-    }
-    if (childDevice) {
-    	log.debug "Sending event to child $childDevice"
-        log.debug childDevice
-        
-    	childDevice.createAndSendEvent(name: "switch", value: "on", displayed: true, isStateChange: true) // childDevice.sendEvent(name: "device.switch", value: "on", displayed: true, isStateChange: true) +
-        	//childDevice.sendEvent(name: "switch", value: "on", displayed: true, isStateChange: true) +
-        	
     }
     
 	lightOn(getEndpoint(child))
@@ -395,7 +372,6 @@ def lightOn(String dni)  {
         log.debug childDevice
     	childDevice.sendEvent(name: "device.switch", value: "on", displayed: true, isStateChange: true)
         childDevice.sendEvent(name: "switch", value: "on", displayed: true, isStateChange: true)
-        childDevice.createEvent(childDevice.createAndSendEvent(name: "switch", value: "on", displayed: true, isStateChange: true ))
     }
     
 	return zigbee.on()
@@ -415,14 +391,12 @@ def lightOff(String id) {
         log.debug childDevice
     	childDevice.sendEvent(name: "device.switch", value: "off", displayed: true, isStateChange: true)
         childDevice.sendEvent(name: "switch", value: "off", displayed: true, isStateChange: true)
-        childDevice.createEvent(childDevice.createAndSendEvent(name: "switch", value: "off", displayed: true, isStateChange: true ))
     }
     
 	return zigbee.off()
     
     
 }
-
 
 void childOn(String dni) {
 	log.debug "childOn(String ${dni})"
@@ -448,11 +422,8 @@ def lightLevel(val) {
     if (childDevice) {
     	log.debug "Sending event to child"
         log.debug childDevice
-    	//childDevice.sendEvent(name: "device.value", value: val)
-        // childDevice.sendEvent(name: "device.switch", value: "on", isStatusChange: true)
         childDevice.sendEvent(name: "switch", value: isDeviceOn? "on": "off", isStatusChange: true, display: true)
         childDevice.sendEvent(name: "value", value: val, isStatusChange: true, display: true)
-        childDevice.createEvent(childDevice.createAndSendEvent(name: "level", value: value,  isStatusChange: true, display: true))
     }
 }
 
@@ -472,7 +443,7 @@ def setLevel(val, rate = null, device=null) {
     else {
     	log.info "Slider acting for fan control on setLevel" 
     	// Dimmer acts on fan control
-		cmds = setFanSpeed(dimmerLevelToSpeed(val?.toInteger()))
+		cmds = setFanSpeed(dimmerLevelToSpeed(val?.toInteger())) + refresh()
         
     }
 
@@ -505,19 +476,25 @@ def ping() {
 def refresh(physicalgraph.device.cache.DeviceDTO child=null) {	
 	log.info "refresh($child) called " 
     
-	return zigbee.onOffRefresh() + zigbee.levelRefresh() + zigbee.readAttribute(0x0202, 0x0000) + zigbee.readAttribute(0x0006, 0x0000) +
-    zigbee.readAttribute(0x0202, 0x0000) + zigbee.readAttribute(0x0202, 0x0001) + zigbee.readAttribute(0x0006, 0x0001) + zigbee.readAttribute(0x0006, 0x0000) +
-    zigbee.readAttribute(0x0008, 0x0004) + zigbee.readAttribute(0x0008, 0x0004)
+    log.trace "That's tthe refresh: ${zigbee.onOffRefresh() + zigbee.levelRefresh() + zigbee.readAttribute(0x0202, 0x0000) + zigbee.readAttribute(0x0006, 0x0000) + zigbee.readAttribute(0x0202, 0x0001) + zigbee.readAttribute(0x0008, 0x0004)}"
+	return zigbee.onOffRefresh() /* same as zigbee.readAttribute(0x0006, 0x0000) + */ + 
+    	zigbee.levelRefresh() + 
+        zigbee.readAttribute(0x0202, 0x0000) + 
+        zigbee.readAttribute(0x0006, 0x0000) + 
+        zigbee.readAttribute(0x0202, 0x0001) + 
+        zigbee.readAttribute(0x0008, 0x0004)
+     	// + zigbee.readAttribute(0x0006, 0x0001)  TODO Confirm it was the cause of blinking light
+    
 }
 
 /**
- * Returns true if  1, dimmer will control fan speed (for Google assistant compatibility) 
+ * Returns true if dimmer will control fan speed (for Google Assistant, Alexa compatibility) 
  */
 def useDimmerAsFanControl() {
-	log.trace("useDimmerAsFanControl(): ${dimmerAsFanControl == 1}")
-    
-    // TODO using number since bool prefs are not saving
-	return dimmerAsFanControl == 1
+	log.trace("useDimmerAsFanControl(): ${settings.dimmerControl}")
+  
+  // Check for dimmerAsFanControl == 1 for legacy reasons. TODO - Remove in future versions
+  return settings.dimmerControl == "Fan" || dimmerAsFanControl == 1
 }
 
 /**
@@ -545,8 +522,6 @@ def dimmerLevelToSpeed(dimmerLevel) {
 	return  Math.round(dimmerLevel/25)
 }
 
-
-    
 
 def raiseFanSpeed() {
 	setFanSpeed(Math.min((device.currentValue("fanSpeed") as Integer) + 1, 3))
