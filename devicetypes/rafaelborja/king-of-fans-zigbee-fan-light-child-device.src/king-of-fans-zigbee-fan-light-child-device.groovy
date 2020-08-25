@@ -78,7 +78,7 @@ void refresh() {
  * Returns true if event map values differs from devices values.
  */
 def isStateChange(event) {
-	log.trace "[isStateChange](${eventChange})"
+	log.trace "[isStateChange(${event})]"
     
 	def eventChange = true;
 	switch(event['name']) {
