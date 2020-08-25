@@ -52,7 +52,8 @@ metadata {
 				attributeState "0", label: "Off", action: "switch.on", icon: "st.thermostat.fan-off", backgroundColor: "#ffffff"
 				attributeState "1", label: "Low", action: "switch.off", icon: "st.thermostat.fan-on", backgroundColor: "#00a0dc"
 				attributeState "2", label: "Medium", action: "switch.off", icon: "st.thermostat.fan-on", backgroundColor: "#00a0dc"
-				attributeState "3", label: "High", action: "switch.off", icon: "st.thermostat.fan-on", backgroundColor: "#00a0dc"
+				attributeState "3", label: "Medium-High", action: "switch.off", icon: "st.thermostat.fan-on", backgroundColor: "#00a0dc"
+                attributeState "4", label: "High", action: "switch.off", icon: "st.thermostat.fan-on", backgroundColor: "#00a0dc"
 			}
 			tileAttribute("device.fanSpeed", key: "VALUE_CONTROL") {
 				attributeState "VALUE_UP", action: "raiseFanSpeed"
@@ -97,7 +98,9 @@ def parse(String description) {
             it.device.deviceNetworkId == "${device.deviceNetworkId}-Light" 
         }          
         event.displayed = true
-        event.isStateChange = childDevice.isStateChange(event)
+        def isStateChange = childDevice.isStateChange(event)
+        log.trace "isStateChange: ${isStateChange}"
+        event.isStateChange = isStateChange
         
         childDevice.sendEvent(event)
         
@@ -107,16 +110,21 @@ def parse(String description) {
         	
             //  TODO remove unused events
         	// TODO refactor to a single method
-            sendEvent(name: "lightBrightness", value: event.value, displayed: true, isStateChange: true) 
-            sendEvent(name: "levelSliderControl", value: event.value, displayed: true, isStateChange: true) 
-            sendEvent(name: "level", value: event.value, displayed: true, isStateChange: true) 
-            sendEvent(name: "switch level", value: event.value, displayed: true, isStateChange: true) 
+            log.trace "lightBrightness: ${device.currentValue('lightBrightness')}"
+            log.trace "levelSliderControl: ${device.currentValue('levelSliderControl')}"
+            log.trace "level: ${device.currentValue('level')}"
+            log.trace "switch level: ${device.currentValue('switch level')}"
+            // sendEvent(name: "lightBrightness", value: event.value, displayed: true, isStateChange: isStateChange) 
+            // sendEvent(name: "levelSliderControl", value: event.value, displayed: true, isStateChange: isStateChange) 
+            sendEvent(name: "level", value: event.value, displayed: true, isStateChange: isStateChange) 
+            // sendEvent(name: "switch level", value: event.value, displayed: true, isStateChange: isStateChange) 
             
         } else {
         	log.debug "not sending lightBrightness"
         }
     }
 	else {
+    	// TODO show fanMode event in history
      	// "Sample: 0104 0006 01 01 0000 00 D42D 00 00 0000 07 01 86000100"
         // "Sample: 0104 0006 01 01 0000 00 D42D 00 00 0000 07 01 00"
         // "Sample: D42D0102020800003000, dni: D42D, endpoint: 01, cluster: 0202, size: 8, attrId: 0000, result: success, encoding: 30, value: 00"
@@ -165,47 +173,77 @@ def speedToLabel(speed) {
  * Creates events for Fan based on speed value (switch, level and fan level)
  */
 def fanEvents(speed) {
-	log.trace "fanEvents(${speed})"
+	log.trace "[fanEvents(${speed})]"
     
-	def value = (speed ? "on" : "off") // TODO review this portion as it is sensing light off to child device when changing dimmer value
+	def value = (speed ? "on" : "off") // TODO rafaeb review this portion as it is sensing light off to child device when changing dimmer value
 	def result = [createEvent(name: "switch", value: value)]
 	// result << createEvent(name: "level", value: speed == 99 ? 100 : speed)
-	result << createEvent(name: "fanSpeed", value: speed)
+	
+    def isSpeedChange = isSpeedChange(speed)
+    result << createEvent(name: "fanSpeed", value: speed, displayed: true, isStateChange: isSpeedChange)
     
     // In case dimmer is being used to control fan (Google assitant compatibility)
     if (useDimmerAsFanControl()) {
     	log.trace "Sending dimmer events for fan event"
         //  TODO remove unused events
         // TODO refactor to a single method
-        result << sendEvent(name: "lightBrightness", value: speedToDimmerLevel(speed), displayed: true, isStateChange: true)  
-        result << sendEvent(name: "levelSliderControl", value:  speedToDimmerLevel(speed), displayed: true, isStateChange: true) 
-        result << sendEvent(name: "level", value:  speedToDimmerLevel(speed), displayed: true, isStateChange: true) 
-        result << sendEvent(name: "switch level", value:  speedToDimmerLevel(speed), displayed: true, isStateChange: true) 
+        log.trace "lightBrightness: ${device.currentValue('lightBrightness')}"
+        log.trace "levelSliderControl: ${device.currentValue('levelSliderControl')}"
+        log.trace "level: ${device.currentValue('level')}"
+        log.trace "switch level: ${device.currentValue('switch level')}"
+        // result << sendEvent(name: "lightBrightness", value: speedToDimmerLevel(speed), displayed: true, isStateChange: isSpeedChange)  
+        // result << sendEvent(name: "levelSliderControl", value:  speedToDimmerLevel(speed), displayed: true, isStateChange: isSpeedChange) 
+        result << sendEvent(name: "level", value:  speedToDimmerLevel(speed), displayed: true, isStateChange: isSpeedChange) 
+        // result << sendEvent(name: "switch level", value:  speedToDimmerLevel(speed), displayed: true, isStateChange: isSpeedChange) 
     }
     
     
-    log.trace "fanEvents(${speed}) returning ${result}"
+    log.trace "[fanEvents(${speed})]: ${result}"
     
 	return result
 }
 
+def isSpeedChange(speed) {
+	log.trace "[isSpeedChange(${speed})]"
+    
+    def speedChange = true
+    
+    def currentSpeed = device.currentValue("fanSpeed")
+    log.trace "speed vs currentSpeed: ${speed} vs ${currentSpeed}"
+    speedChange = (speed != currentSpeed)
+    log.trace "[isSpeedChange]: ${speedChange}"
+    
+    return speedChange
+    
+}
 
-def installed() {
-	log.debug "installed()"
+
+def installed() {	log.debug "[installed()]"
+
+    
 	initialize()
 }
 
 
 def updated() {
-	log.debug "updated()"
-	/ * if(state.oldLabel != device.label) {updateChildLabel()} */ // TODO DEV ONLY
-		initialize()    
+	log.debug "[updated()]"
+    
+    initialize()
 }
 
 def initialize() {	
-	log.info "initialize()"     
+	log.info "[initialize()]"     
+    // TODO subscribe child to events subscribe(theswitch, "switch.on", incrementCounter)
     
-    
+    // Converting and remove legacy (v.01) flag
+    if (settings?.dimmerAsFanControl != null) {
+    	if (settings.dimmerAsFanControl == 1) {
+        	settings.dimmerControl = "Fan"
+        } else {
+        	settings.dimmerControl = "Light"
+        }
+        settings?.remove("dimmerAsFanControl")
+    }
     
     if(refreshChildren) { 
         deleteChildren()            
@@ -492,17 +530,16 @@ def refresh(physicalgraph.device.cache.DeviceDTO child=null) {
  */
 def useDimmerAsFanControl() {
 	log.trace("useDimmerAsFanControl(): ${settings.dimmerControl}")
-  
-  // Check for dimmerAsFanControl == 1 for legacy reasons. TODO - Remove in future versions
-  return settings.dimmerControl == "Fan" || dimmerAsFanControl == 1
+	return settings.dimmerControl == "Fan"
 }
 
 /**
  * Returns a dimmer value for a given speed
- *  - 0 to 24 is speed 25 (turn off)
- *  - 24 to 49 is speed 1 (low)
- *  - 50 to 74 is speed 2 (medium)
- *  - 75 to 100 is speed 3 (high)
+ * - 0 to 18 is speed 0 (turn off)
+ *  - 20 to 39 is speed 1 (low)
+ *  - 40 to 59 is speed 2 (medium)
+ *  - 60 to 79 is speed 3 (medium-high)
+ *  - 80 to 100 is speed 4 (high)
  */
 def speedToDimmerLevel(speed) {
 	return speed*25
@@ -510,16 +547,17 @@ def speedToDimmerLevel(speed) {
 
 /**
  * Returns a fan value for a given dimmer value
- *  - 0 to 24 is speed 25 (turn off)
- *  - 24 to 49 is speed 1 (low)
- *  - 50 to 74 is speed 2 (medium)
- *  - 75 to 100 is speed 3 (high)
+ *  - 0 to 18 is speed 0 (turn off)
+ *  - 20 to 39 is speed 1 (low)
+ *  - 40 to 59 is speed 2 (medium)
+ *  - 60 to 79 is speed 3 (medium-high)
+ *  - 80 to 100 is speed 4 (high)
  */
 def dimmerLevelToSpeed(dimmerLevel) {
 	if (dimmerLevel == null) {
     	dimmerLevel = 0
     }
-	return  Math.round(dimmerLevel/25)
+	return  Math.round(dimmerLevel/20)
 }
 
 
