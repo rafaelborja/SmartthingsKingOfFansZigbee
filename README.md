@@ -13,8 +13,8 @@ This device handler has a main device for Fan Control and a child device for lig
 
 If you are using Google assistant you can set option dimmerAsFanControl to true to control fan speed using light dimmer.
 Google assistant does not properly support fan speed dial, showing it as a light dimmer instead. When this option is activated you can set fan speed with the command in Google Assistant as "Set <FAN NAME> speed to <0 to 100>", where:
-  - 0 to 24 is speed 25 (turn off),
-  - 24 to 49 is speed 1 (low),
+  - 0 to 24 is speed 0 (turn off),
+  - 25 to 49 is speed 1 (low),
   - 50 to 74 is speed 2 (medium),
   - 75 to 100 is speed 3 (high),
   
