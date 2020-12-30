@@ -541,8 +541,14 @@ def useDimmerAsFanControl() {
  *  - 60 to 79 is speed 3 (medium-high)
  *  - 80 to 100 is speed 4 (high)
  */
+ 
 def speedToDimmerLevel(speed) {
-	return speed*25
+	if(speed !=6) {
+    return speed*25
+    }
+    else {
+    return speed-5
+    }
 }
 
 /**
@@ -553,8 +559,13 @@ def speedToDimmerLevel(speed) {
  *  - 61 to 80 is speed 3 (medium-high)
  *  - 81 to 100 is speed 4 (high)
  */
-def dimmerLevelToSpeed(dimmerLevel) { 
-	return  (Math.floor(dimmerLevel/20.04) as Integer)
+ def dimmerLevelToSpeed(dimmerLevel) {
+    if(dimmerLevel == 1) {
+      return 6 
+    }
+    else {
+      return (Math.floor(dimmerLevel/20.04)) as Integer
+    }
 }
 
 
