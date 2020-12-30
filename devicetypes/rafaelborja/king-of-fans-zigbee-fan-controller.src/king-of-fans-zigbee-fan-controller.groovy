@@ -560,13 +560,11 @@ def speedToDimmerLevel(speed) {
  *  - 81 to 100 is speed 4 (high)
  */
  def dimmerLevelToSpeed(dimmerLevel) {
-	
-    
     if(dimmerLevel == 1) {
-    return 6 
+      return 6 
     }
     else {
-    return (Math.floor(dimmerLevel/20.04)) as Integer
+      return (Math.floor(dimmerLevel/20.04)) as Integer
     }
 }
 
